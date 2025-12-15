@@ -3,8 +3,8 @@ query "component/bulk-import" verb=POST {
   auth = "user"
 
   input {
-    // CSV content string with headers: sku,name,description,unit_of_measure,cost_per_unit,no_depreciate,reorder_point,preferred_supplier
-    text csv_data
+    // CSV file containing component data
+    file csv_file
   }
 
   stack {
@@ -23,15 +23,9 @@ query "component/bulk-import" verb=POST {
       error = "Default location not found for this tenant. Please configure a default location."
     }
   
-    // Create a temporary file resource from the CSV text string to allow parsing
-    storage.create_file_resource {
-      filename = "import.csv"
-      filedata = $input.csv_data
-    } as $temp_csv_file
-  
-    // Parse the CSV data
+    // Parse the CSV data directly from the uploaded file
     stream.from_csv {
-      value = $temp_csv_file
+      value = $input.csv_file
       separator = ","
       enclosure = '"'
       escape_char = '"'
