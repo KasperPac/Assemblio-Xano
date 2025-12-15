@@ -16,13 +16,14 @@ query sync_shopify_product verb=POST {
       field_name = "shopify_product_id"
       field_value = $input.id
       data = {
-        created_at: now
-        tenant_id : 2
-        title     : $input.title
-        handle    : $input.handle
-        status    : $input.status
-        iamge_url : $input.image_url
-        updated_at: now
+        created_at      : now
+        tenant_id       : 1
+        shopify_store_id: 1
+        title           : $input.title
+        handle          : $input.handle
+        status          : $input.status
+        iamge_url       : $input.image_url
+        updated_at      : now
       }
     } as $upserted_product
   
