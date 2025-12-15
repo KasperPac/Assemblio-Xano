@@ -1,0 +1,29 @@
+query user verb=GET {
+  api_group = "Members & Accounts"
+  auth = "user"
+
+  input {
+  }
+
+  stack {
+    function.run resolve_tenant {
+      input = {user_id: $auth.id}
+    } as $ctx_tenant
+  
+    // Fetch all users associated with the resolved tenant via the user_tenant_role table
+    db.query user {
+      join = {
+        user_tenant_role: {
+          table: "user_tenant_role"
+          where: $db.user.id == $db.user_tenant_role.user_id
+        }
+      }
+    
+      where = $db.user_tenant_role.tenant_id == $ctx_tenant.self.message.tenant_id
+      return = {type: "list"}
+    } as $users
+  }
+
+  response = $users
+  tags = ["users"]
+}
