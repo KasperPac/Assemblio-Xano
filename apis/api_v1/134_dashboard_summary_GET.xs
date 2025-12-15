@@ -37,7 +37,7 @@ query dashboard_summary verb=GET {
         }
       }
     
-      where = $db.component.tenant_id == $ctx_tenant.self.message.tenant_id && ($db.inventory_balance.on_hand_qty <= $db.component.reorder_point && $db.inventory_balance.on_hand_qty > 0)
+      where = $db.component.tenant_id == $ctx_tenant.self.message.tenant_id && ($db.inventory_balance.on_hand_qty <= $db.component.reorder_point && $db.inventory_balance.on_hand_qty > -1)
       return = {type: "count"}
     } as $low_stock_components_count
   
