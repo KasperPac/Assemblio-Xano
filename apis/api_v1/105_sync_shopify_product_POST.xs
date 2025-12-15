@@ -49,7 +49,7 @@ query sync_shopify_product verb=POST {
           field_value = $variant_item.id
           data = {
             created_at        : now
-            tenant_id         : 2
+            tenant_id         : 1
             shopify_product_id: $upserted_product.id
             sku               : $variant_item.sku
             title             : $variant_item.title
