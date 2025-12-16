@@ -177,10 +177,13 @@ query "purchase_orders/create_received" verb=POST {
           field_value = $target_location_id
         } as $loc
       
-        // Extract component details first to avoid nested filter complexity
+        // Explicitly construct the component details object to avoid filter argument errors
         var $comp_details {
-          value = $comp
-            |pick:["sku", "name", "unit_of_measure"]
+          value = {
+            sku            : $comp.sku
+            name           : $comp.name
+            unit_of_measure: $comp.unit_of_measure
+          }
         }
       
         var $line_response {
