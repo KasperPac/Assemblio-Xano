@@ -32,6 +32,8 @@ table purchase_order {
   
     // Additional notes related to the purchase order.
     text notes? filters=trim
+  
+    image? delivery_receipt?
   }
 
   index = [
