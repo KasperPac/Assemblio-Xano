@@ -15,7 +15,7 @@ query "shopify/webhooks/orders_fulfillment" verb=POST {
     }
   
     var $shop_domain {
-      value = `pactechdevtemp.myshopify.com`
+      value = $env.$http_headers.X-Shopify-Shop-Domain
     }
   
     conditional {
