@@ -33,20 +33,9 @@ query "purchase_orders/create_received" verb=POST {
   }
 
   stack {
-    // Resolve Tenant for the authenticated user
-    db.query user_tenant_role {
-      where = $db.user_tenant_role.user_id == $auth.id
-      return = {type: "single"}
-    } as $user_role
-  
-    precondition ($user_role != null) {
-      error_type = "accessdenied"
-      error = "User is not associated with a tenant."
-    }
-  
-    var $tenant_id {
-      value = $user_role.tenant_id
-    }
+    function.run resolve_tenant {
+      input = {user_id: $auth.id}
+    } as $func1
   
     // Validate Inputs
     precondition (($input.po_number|strlen) > 0) {
@@ -65,7 +54,7 @@ query "purchase_orders/create_received" verb=POST {
     }
   
     db.query component {
-      where = $db.component.id in $comp_ids && $db.component.tenant_id == $tenant_id
+      where = $db.component.id in $comp_ids && $db.component.tenant_id == "funct1.self.message.tenant_id"
       return = {type: "list"}
     } as $valid_components
   
@@ -77,13 +66,14 @@ query "purchase_orders/create_received" verb=POST {
     // Create Purchase Order
     db.add purchase_order {
       data = {
-        tenant         : $tenant_id
+        created_at     : "now"
+        updated_at     : "now"
+        tenant         : $func1.self.message.tenant_id
         created_by_user: $auth.id
         po_number      : $input.po_number
         status         : "RECEIVED"
         supplier_name  : $input.supplier_name
         notes          : $input.notes
-        updated_at     : "now"
       }
     } as $po
   
@@ -108,20 +98,21 @@ query "purchase_orders/create_received" verb=POST {
         // Create PO Line
         db.add purchase_order_line {
           data = {
-            tenant           : $tenant_id
+            created_at       : "now"
+            updated_at       : "now"
+            tenant           : $func1.self.message.tenant_id
             purchase_order   : $po.id
             component        : $item.component_id
             quantity_ordered : $item.quantity
             quantity_received: $item.quantity
             location         : $target_location_id
             unit_cost        : $comp.cost_per_unit
-            updated_at       : "now"
           }
         } as $line
       
         // Update Inventory Balance
         db.query inventory_balance {
-          where = $db.inventory_balance.component_id == $item.component_id && $db.inventory_balance.location_id == $target_location_id && $db.inventory_balance.tenant_id == $tenant_id
+          where = $db.inventory_balance.component_id == $item.component_id && $db.inventory_balance.location_id == $target_location_id && $db.inventory_balance.tenant_id == $func1.self.message.tenant_id
           return = {type: "single"}
         } as $balance
       
@@ -148,7 +139,8 @@ query "purchase_orders/create_received" verb=POST {
           else {
             db.add inventory_balance {
               data = {
-                tenant_id      : $tenant_id
+                created_at     : "now"
+                tenant_id      : $func1.self.message.tenant_id
                 component_id   : $item.component_id
                 location_id    : $target_location_id
                 on_hand_qty    : $item.quantity
