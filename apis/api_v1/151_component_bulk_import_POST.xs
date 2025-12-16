@@ -4,9 +4,9 @@ query "component/bulk-import" verb=POST {
 
   input {
     // CSV file containing component data
-    file csv_file
+    file csv_file?
   
-    attachment? csv_file2?
+    attachment? csv_file2
   }
 
   stack {
@@ -27,7 +27,7 @@ query "component/bulk-import" verb=POST {
   
     // Parse the CSV data directly from the uploaded file
     stream.from_csv {
-      value = $input.csv_file
+      value = $input.csv_file2
       separator = ","
       enclosure = '"'
       escape_char = '"'
