@@ -61,7 +61,7 @@ query "purchase_orders/create_received" verb=POST {
   
     // Verify Components exist and belong to tenant
     var $comp_ids {
-      value = $input.components|map:$this.component_id|unique
+      value = $input.components|map:$$.component_id|unique
     }
   
     db.query component {
@@ -97,7 +97,7 @@ query "purchase_orders/create_received" verb=POST {
         // Find component details from verification result
         var $comp {
           value = $valid_components
-            |find:($this.id == $item.component_id)
+            |find:($$.id == $item.component_id)
         }
       
         // Determine Location
