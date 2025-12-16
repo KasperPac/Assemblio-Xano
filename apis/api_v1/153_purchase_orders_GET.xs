@@ -6,7 +6,15 @@ query purchase_orders verb=GET {
   }
 
   stack {
+    function.run resolve_tenant {
+      input = {user_id: $auth.id}
+    } as $ctx_tenant
+  
+    db.query purchase_order {
+      where = $db.purchase_order.tenant == $ctx_tenant.self.message.tenant_id
+      return = {type: "list"}
+    } as $purchase_order1
   }
 
-  response = null
+  response = {purchase_orders: ""}
 }
