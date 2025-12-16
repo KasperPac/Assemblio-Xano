@@ -4,27 +4,16 @@ query "purchase_orders/create_received" verb=POST {
   auth = "user"
 
   input {
-    // The Purchase Order Number
     text po_number filters=trim
-  
-    // Name of the supplier
     text supplier_name? filters=trim
-  
-    // Optional notes
     text notes? filters=trim
-  
-    // List of components to order and receive
     object[] components {
       schema {
-        // ID of the component
         int component_id {
           table = "component"
         }
       
-        // Quantity ordered and received
         decimal quantity
-      
-        // Target location ID. Defaults to component default if null.
         int location_id? {
           table = "location"
         }
@@ -35,14 +24,13 @@ query "purchase_orders/create_received" verb=POST {
   stack {
     function.run resolve_tenant {
       input = {user_id: $auth.id}
-    } as $func1
+    } as $ctx_tenant
   
-    // Extract tenant_id to a variable for consistent use and to prevent null errors
+    // Simplified tenant_id extraction. Assuming resolve_tenant returns the tenant record.
     var $tenant_id {
-      value = $func1.self.message.tenant_id
+      value = $ctx_tenant.self.message.tenant_id
     }
   
-    // Validate Inputs
     precondition (($input.po_number|strlen) > 0) {
       error_type = "inputerror"
       error = "PO Number is required."
@@ -53,7 +41,6 @@ query "purchase_orders/create_received" verb=POST {
       error = "At least one component is required."
     }
   
-    // Extract Component IDs using array.map for robustness
     array.map ($input.components) {
       by = $this.component_id
     } as $comp_ids
@@ -62,7 +49,6 @@ query "purchase_orders/create_received" verb=POST {
       value = $comp_ids|unique
     }
   
-    // Verify Components exist and belong to tenant
     db.query component {
       where = $db.component.id in $comp_ids && $db.component.tenant_id == $tenant_id
       return = {type: "list"}
@@ -73,7 +59,16 @@ query "purchase_orders/create_received" verb=POST {
       error = "One or more components are invalid or do not belong to your tenant."
     }
   
-    // Create Purchase Order
+    // Create an indexed object for O(1) lookups: { "id_string": component_object }
+    // This ensures robust lookup regardless of integer/string type differences
+    array.map ($valid_components) {
+      by = {key: $this.id|to_text, value: $this}
+    } as $component_map_entries
+  
+    var $indexed_components {
+      value = $component_map_entries|create_object_from_entries
+    }
+  
     db.add purchase_order {
       data = {
         created_at     : "now"
@@ -91,21 +86,18 @@ query "purchase_orders/create_received" verb=POST {
       value = []
     }
   
-    // Process each component line
     foreach ($input.components) {
       each as $item {
-        // Find component details from verification result
+        // Direct lookup using the indexed object. 
+        // Casting to text ensures the key matches the object key format.
         var $comp {
-          value = $valid_components
-            |find:($$.id == $item.component_id)
+          value = $indexed_components|get:($item.component_id|to_text)
         }
       
-        // Determine Location
         var $target_location_id {
           value = $item.location_id != null ? $item.location_id : $comp.default_location_id
         }
       
-        // Create PO Line
         db.add purchase_order_line {
           data = {
             created_at       : "now"
@@ -119,7 +111,6 @@ query "purchase_orders/create_received" verb=POST {
           }
         } as $line
       
-        // Update Inventory Balance
         db.query inventory_balance {
           where = $db.inventory_balance.component_id == $item.component_id && $db.inventory_balance.location_id == $target_location_id && $db.inventory_balance.tenant_id == $tenant_id
           return = {type: "single"}
@@ -165,7 +156,6 @@ query "purchase_orders/create_received" verb=POST {
           }
         }
       
-        // Log Inventory Movement
         db.add inventory_movement {
           data = {
             tenant_id         : $tenant_id
@@ -182,22 +172,23 @@ query "purchase_orders/create_received" verb=POST {
           }
         }
       
-        // Get Location Name for Response
         db.get location {
           field_name = "id"
           field_value = $target_location_id
         } as $loc
       
-        // Build Line Response
+        // Extract component details first to avoid nested filter complexity
+        var $comp_details {
+          value = $comp
+            |pick:["sku", "name", "unit_of_measure"]
+        }
+      
         var $line_response {
           value = $line
         }
       
         var.update $line_response {
-          value = $line_response
-            |set:"component":($comp
-              |pick:["sku", "name", "unit_of_measure"]
-            )
+          value = $line_response|set:"component":$comp_details
         }
       
         var.update $line_response {
@@ -210,7 +201,6 @@ query "purchase_orders/create_received" verb=POST {
       }
     }
   
-    // Log Activity
     db.add activity_log {
       data = {
         tenant_id  : $tenant_id
@@ -222,7 +212,6 @@ query "purchase_orders/create_received" verb=POST {
       }
     }
   
-    // Construct Final Response
     var $response_data {
       value = $po
     }
