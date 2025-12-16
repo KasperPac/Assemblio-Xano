@@ -16,5 +16,5 @@ query purchase_orders verb=GET {
     } as $purchase_order1
   }
 
-  response = {purchase_orders: ""}
+  response = {purchase_orders: $purchase_order1}
 }
