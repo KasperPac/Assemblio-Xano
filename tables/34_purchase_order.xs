@@ -34,6 +34,8 @@ table purchase_order {
     text notes? filters=trim
   
     attachment? delivery_receipt?
+    date? order_date?
+    date? delivery_date?
   }
 
   index = [
