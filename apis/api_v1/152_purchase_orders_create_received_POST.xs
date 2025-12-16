@@ -14,7 +14,7 @@ query "purchase_orders/create_received" verb=POST {
     text notes? filters=trim
   
     // List of components to order and receive
-    object[1:1] components {
+    object[] components {
       schema {
         // ID of the component
         int component_id {
