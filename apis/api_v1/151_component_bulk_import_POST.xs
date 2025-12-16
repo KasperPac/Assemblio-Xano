@@ -5,6 +5,8 @@ query "component/bulk-import" verb=POST {
   input {
     // CSV file containing component data
     file csv_file
+  
+    attachment? csv_file2?
   }
 
   stack {
