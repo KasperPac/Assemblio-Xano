@@ -37,6 +37,11 @@ query "purchase_orders/create_received" verb=POST {
       input = {user_id: $auth.id}
     } as $func1
   
+    // Extract tenant_id to a variable for consistent use and to prevent null errors
+    var $tenant_id {
+      value = $func1.self.message.tenant_id
+    }
+  
     // Validate Inputs
     precondition (($input.po_number|strlen) > 0) {
       error_type = "inputerror"
@@ -48,13 +53,18 @@ query "purchase_orders/create_received" verb=POST {
       error = "At least one component is required."
     }
   
-    // Verify Components exist and belong to tenant
-    var $comp_ids {
-      value = $input.components|map:$$.component_id|unique
+    // Extract Component IDs using array.map for robustness
+    array.map ($input.components) {
+      by = $this.component_id
+    } as $comp_ids
+  
+    var.update $comp_ids {
+      value = $comp_ids|unique
     }
   
+    // Verify Components exist and belong to tenant
     db.query component {
-      where = $db.component.id in $comp_ids && $db.component.tenant_id == "funct1.self.message.tenant_id"
+      where = $db.component.id in $comp_ids && $db.component.tenant_id == $tenant_id
       return = {type: "list"}
     } as $valid_components
   
@@ -68,7 +78,7 @@ query "purchase_orders/create_received" verb=POST {
       data = {
         created_at     : "now"
         updated_at     : "now"
-        tenant         : $func1.self.message.tenant_id
+        tenant         : $tenant_id
         created_by_user: $auth.id
         po_number      : $input.po_number
         status         : "RECEIVED"
@@ -100,19 +110,18 @@ query "purchase_orders/create_received" verb=POST {
           data = {
             created_at       : "now"
             updated_at       : "now"
-            tenant           : $func1.self.message.tenant_id
+            tenant           : $tenant_id
             purchase_order   : $po.id
             component        : $item.component_id
             quantity_ordered : $item.quantity
             quantity_received: $item.quantity
             location         : $target_location_id
-            unit_cost        : $comp.cost_per_unit
           }
         } as $line
       
         // Update Inventory Balance
         db.query inventory_balance {
-          where = $db.inventory_balance.component_id == $item.component_id && $db.inventory_balance.location_id == $target_location_id && $db.inventory_balance.tenant_id == $func1.self.message.tenant_id
+          where = $db.inventory_balance.component_id == $item.component_id && $db.inventory_balance.location_id == $target_location_id && $db.inventory_balance.tenant_id == $tenant_id
           return = {type: "single"}
         } as $balance
       
@@ -140,7 +149,7 @@ query "purchase_orders/create_received" verb=POST {
             db.add inventory_balance {
               data = {
                 created_at     : "now"
-                tenant_id      : $func1.self.message.tenant_id
+                tenant_id      : $tenant_id
                 component_id   : $item.component_id
                 location_id    : $target_location_id
                 on_hand_qty    : $item.quantity
@@ -168,6 +177,8 @@ query "purchase_orders/create_received" verb=POST {
             reference_type    : "purchase_order"
             reference_id      : $po.id
             created_by_user_id: $auth.id
+            reason_code       : "PO_CREATE"
+            note              : "Stock received via PO " ~ $input.po_number
           }
         }
       
