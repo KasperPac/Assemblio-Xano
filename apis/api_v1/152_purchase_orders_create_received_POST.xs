@@ -14,7 +14,7 @@ query "purchase_orders/create_received" verb=POST {
     text notes? filters=trim
   
     // List of components to order and receive
-    object[] components {
+    object[1:1] components {
       schema {
         // ID of the component
         int component_id {
@@ -23,9 +23,6 @@ query "purchase_orders/create_received" verb=POST {
       
         // Quantity ordered and received
         decimal quantity
-      
-        // Cost per unit
-        decimal unit_cost
       
         // Target location ID. Defaults to component default if null.
         int location_id? {
@@ -117,7 +114,7 @@ query "purchase_orders/create_received" verb=POST {
             quantity_ordered : $item.quantity
             quantity_received: $item.quantity
             location         : $target_location_id
-            unit_cost        : $item.unit_cost
+            unit_cost        : $comp.cost_per_unit
             updated_at       : "now"
           }
         } as $line
