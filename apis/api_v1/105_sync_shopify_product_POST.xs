@@ -17,8 +17,8 @@ query sync_shopify_product verb=POST {
       field_value = $input.id
       data = {
         created_at      : now
-        tenant_id       : 1
-        shopify_store_id: 1
+        tenant_id       : 3
+        shopify_store_id: 2
         title           : $input.title
         handle          : $input.handle
         status          : $input.status
