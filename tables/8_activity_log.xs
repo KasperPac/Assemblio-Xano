@@ -16,9 +16,7 @@ table activity_log {
     text entity_type?
     int entity_id?
     text message?
-    object RawData? {
-      schema
-    }
+    json RawData?
   }
 
   index = [
