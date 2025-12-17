@@ -168,6 +168,15 @@ query component verb=POST {
             message    : ["Component",$new_component.name,"Added with ID:",$new_component.id]|join:" "
             RawData    : $new_component
           }
+        
+          addon = [
+            {
+              name  : "user"
+              output: ["id", "name", "role"]
+              input : {user_id: $output.user_id}
+              as    : "_user"
+            }
+          ]
         } as $activity_log1
       }
     }
