@@ -26,6 +26,7 @@ query component verb=POST {
   
     int? cost_per_item?
     bool no_depreciate?
+    bool modify?
   }
 
   stack {
@@ -39,7 +40,16 @@ query component verb=POST {
       return = {type: "single"}
     } as $existing_component
   
-    precondition ($existing_component == null) {
+    conditional {
+      if ($input.modify == false) {
+        precondition ($existing_component == null) {
+          error_type = "badrequest"
+          error = "SKU already exists"
+        }
+      }
+    }
+  
+    !precondition ($existing_component == null) {
       error_type = "inputerror"
       error = "SKU already exists for this tenant."
     }
