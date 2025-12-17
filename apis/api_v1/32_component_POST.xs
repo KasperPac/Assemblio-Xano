@@ -70,7 +70,7 @@ query component verb=POST {
     }
   
     // 4) Insert component row with tenant_id and provided fields; is_active defaults to true.
-    db.add component {
+    !db.add component {
       data = {
         created_at         : "now"
         tenant_id          : $ctx_tenant.self.message.tenant_id
@@ -84,6 +84,25 @@ query component verb=POST {
         preferred_supplier : $input.preferred_supplier
         is_active          : true
         updated_at         : "now"
+      }
+    } as $new_component
+  
+    // 4) Upsert component row with tenant_id and provided fields; is_active defaults to true.
+    db.add_or_edit component {
+      field_name = "sku"
+      field_value = $input.sku|to_upper
+      data = {
+        tenant_id          : $ctx_tenant.self.message.tenant_id
+        name               : $input.name
+        description        : $input.description
+        unit_of_measure    : $input.unit_of_measure
+        cost_per_unit      : $input.cost_per_item
+        no_depreciate      : $input.no_depreciate
+        default_location_id: $input.default_location_id
+        reorder_point      : $input.reorder_point
+        preferred_supplier : $input.preferred_supplier
+        is_active          : true
+        updated_at         : now
       }
     } as $new_component
   
@@ -121,7 +140,39 @@ query component verb=POST {
       }
     }
   
-    db.add activity_log {
+    conditional {
+      if ($input.modify) {
+        db.add activity_log {
+          data = {
+            created_at : "now"
+            tenant_id  : $ctx_tenant.self.message.tenant_id
+            user_id    : $auth.id
+            event_type : "Component Modified"
+            entity_type: "COMPONENT"
+            entity_id  : $response_data.component.id
+            message    : ["Component",$new_component.name,"Modified"]|join:" "
+            RawData    : [$new_component]|append:$existing_component
+          }
+        }
+      }
+    
+      else {
+        db.add activity_log {
+          data = {
+            created_at : "now"
+            tenant_id  : $ctx_tenant.self.message.tenant_id
+            user_id    : $auth.id
+            event_type : "Component Modified"
+            entity_type: "COMPONENT"
+            entity_id  : $response_data.component.id
+            message    : ["Component",$new_component.name,"Added with ID:",$new_component.id]|join:" "
+            RawData    : $new_component
+          }
+        } as $activity_log1
+      }
+    }
+  
+    !db.add activity_log {
       data = {
         created_at : "now"
         tenant_id  : $ctx_tenant.self.message.tenant_id
@@ -130,6 +181,7 @@ query component verb=POST {
         entity_type: "COMPONENT"
         entity_id  : $response_data.component.id
         message    : ["Component",$new_component.name,"Added with ID:",$new_component.id]|join:" "
+        RawData    : $existing_component
       }
     }
   }
