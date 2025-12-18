@@ -7,7 +7,7 @@ query "stocktake-sessions/{session_id}" verb=PATCH {
     int line_id?
     text status? filters=trim
     text note? filters=trim
-    json counted_qty?
+    decimal counted_qty?
   }
 
   stack {
@@ -46,12 +46,16 @@ query "stocktake-sessions/{session_id}" verb=PATCH {
           error = "Stocktake line not found or does not belong to this session."
         }
       
-        var $qty_key {
+        !var $qty_key {
           value = $input.line_id|to_text
         }
       
-        var $extracted_qty {
+        !var $extracted_qty {
           value = $input.counted_qty|get:$qty_key
+        }
+      
+        var $extracted_qty {
+          value = $input.counted_qty
         }
       
         var $final_counted_qty {
