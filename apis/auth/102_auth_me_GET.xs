@@ -14,11 +14,11 @@ query "auth/me" verb=GET {
         "id"
         "created_at"
         "name"
+        "full_name"
         "email"
         "account_id"
-        "password_reset"
-        "full_name"
         "updated_at"
+        "Avatar.url"
       ]
     } as $user
   
