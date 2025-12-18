@@ -23,6 +23,7 @@ query "purchase_orders/create_received" verb=POST {
     date? order_date?
     date? delivery_date?
     file? delivery_receipt?
+    attachment? Attachment?
   }
 
   stack {
