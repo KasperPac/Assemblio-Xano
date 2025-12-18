@@ -15,11 +15,6 @@ table user {
       table = "account"
     }
   
-    // The role of the user within their company (e.g., 'admin', 'member').
-    enum role? {
-      values = ["admin", "member"]
-    }
-  
     image? Avatar?
     object password_reset? {
       schema {
@@ -31,7 +26,7 @@ table user {
   
     timestamp? Last_Login?
     timestamp updated_at?
-    int role_id? {
+    int role? {
       table = "role"
     }
   }
