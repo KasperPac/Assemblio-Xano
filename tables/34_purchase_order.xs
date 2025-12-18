@@ -35,6 +35,7 @@ table purchase_order {
   
     date? order_date?
     date? delivery_date?
+    attachment? delivery_receipt?
   }
 
   index = [
