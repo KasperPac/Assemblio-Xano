@@ -76,14 +76,17 @@ query "purchase_orders/create_received" verb=POST {
   
     db.add purchase_order {
       data = {
-        created_at     : "now"
-        updated_at     : "now"
-        tenant         : $tenant_id
-        created_by_user: $auth.id
-        po_number      : $input.po_number
-        status         : "RECEIVED"
-        supplier_name  : $input.supplier_name
-        notes          : $input.notes
+        created_at      : "now"
+        updated_at      : "now"
+        tenant          : $tenant_id
+        created_by_user : $auth.id
+        po_number       : $input.po_number
+        status          : "RECEIVED"
+        supplier_name   : $input.supplier_name
+        notes           : $input.notes
+        order_date      : $input.order_date
+        delivery_date   : $input.delivery_date
+        delivery_receipt: $input.Attachment
       }
     } as $po
   
