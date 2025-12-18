@@ -31,7 +31,6 @@ table user {
   
     timestamp? Last_Login?
     timestamp updated_at?
-    int Role?
   }
 
   index = [
