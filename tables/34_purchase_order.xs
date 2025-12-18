@@ -33,7 +33,6 @@ table purchase_order {
     // Additional notes related to the purchase order.
     text notes? filters=trim
   
-    attachment? delivery_receipt?
     date? order_date?
     date? delivery_date?
   }
