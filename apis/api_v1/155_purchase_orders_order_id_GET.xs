@@ -1,5 +1,5 @@
 // Retrieves the line items for a specific purchase order, ensuring tenant isolation.
-query "purchase_order/lines" verb=GET {
+query "purchase_orders/{order_id}" verb=GET {
   api_group = "api_v1"
   auth = "user"
 
