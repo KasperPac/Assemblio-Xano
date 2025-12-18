@@ -26,9 +26,6 @@ table user {
   
     timestamp? Last_Login?
     timestamp updated_at?
-    int role? {
-      table = "role"
-    }
   }
 
   index = [

@@ -40,6 +40,7 @@ query "auth/me" verb=GET {
         var.update $user {
           value = $user
             |set:"role_name":$tenant_role_info.role_name
+            |set:"role_id":$tenant_role_info.role_id
         }
       }
     }
