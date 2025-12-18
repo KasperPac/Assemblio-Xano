@@ -43,5 +43,5 @@ query "purchase_orders/{order_id}" verb=GET {
     } as $lines
   }
 
-  response = $lines
+  response = {lines: $lines, purchase_order: $purchase_order}
 }
