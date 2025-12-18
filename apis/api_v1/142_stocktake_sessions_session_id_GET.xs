@@ -56,7 +56,7 @@ query "stocktake-sessions/{session_id}" verb=GET {
       each as $line {
         // Check for adjusted status
         conditional {
-          if ($line.status == "ADJUSTED") {
+          if ($line.status == "ADJUSTED" || $line.status == "APPROVED") {
             var.update $count_adjusted {
               value = $count_adjusted + 1
             }
