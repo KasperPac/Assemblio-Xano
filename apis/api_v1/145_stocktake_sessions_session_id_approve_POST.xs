@@ -54,7 +54,7 @@ query "stocktake-sessions/{session_id}/approve" verb=POST {
       
         conditional {
           if ($variance == null) {
-            var.update $variance {
+            !var.update $variance {
               value = $line.counted_qty - $line.expected_qty
             }
           }
