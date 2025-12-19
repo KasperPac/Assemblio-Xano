@@ -14,9 +14,19 @@ query "product_bom_component/{bom_id}" verb=POST {
       input = {user_id: $auth.id}
     } as $ctx_tenant
   
+    db.query product_bom_component {
+      where = $db.product_bom_component.product_bom_id == $input.product_bom_id
+      return = {type: "list"}
+    } as $product_bom_component1
+  
     precondition ($ctx_tenant != null) {
       error_type = "notfound"
       error = "BOM not found"
+    }
+  
+    precondition ($product_bom_component1.component_id != $input.component_id) {
+      error_type = "badrequest"
+      error = "Component already exists in BoM"
     }
   
     db.add product_bom_component {
