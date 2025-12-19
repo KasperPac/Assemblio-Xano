@@ -7,6 +7,8 @@ query "product_bom_component/{bom_id}" verb=POST {
     dblink {
       table = "product_bom_component"
     }
+  
+    bool modify?
   }
 
   stack {
@@ -24,14 +26,32 @@ query "product_bom_component/{bom_id}" verb=POST {
       error = "BOM not found"
     }
   
-    precondition ($product_bom_component1 == null) {
-      error_type = "badrequest"
-      error = "Component already exists in BoM"
+    conditional {
+      if ($input.modify) {
+      }
+    
+      else {
+        precondition ($product_bom_component1 == null) {
+          error_type = "badrequest"
+          error = "Component already exists is BoM"
+        }
+      }
     }
   
-    db.add product_bom_component {
+    !db.add product_bom_component {
       data = {
         created_at       : "now"
+        product_bom_id   : $input.product_bom_id
+        component_id     : $input.component_id
+        quantity_per_unit: $input.quantity_per_unit
+        updated_at       : now
+      }
+    } as $product_bom_component
+  
+    db.add_or_edit product_bom_component {
+      field_name = "id"
+      field_value = $product_bom_component1.id
+      data = {
         product_bom_id   : $input.product_bom_id
         component_id     : $input.component_id
         quantity_per_unit: $input.quantity_per_unit
