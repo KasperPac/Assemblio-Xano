@@ -57,7 +57,7 @@ query "product_bom_component/{bom_id}" verb=POST {
             quantity_per_unit: $input.quantity_per_unit
             updated_at       : now
           }
-        } as $product_bom_component2
+        } as $product_bom_component
       }
     
       else {
