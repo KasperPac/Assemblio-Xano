@@ -15,8 +15,8 @@ query "product_bom_component/{bom_id}" verb=POST {
     } as $ctx_tenant
   
     db.query product_bom_component {
-      where = $db.product_bom_component.product_bom_id == $input.product_bom_id
-      return = {type: "list"}
+      where = $db.product_bom_component.component_id == $input.component_id && $db.product_bom_component.product_bom_id == $input.product_bom_id
+      return = {type: "single"}
     } as $product_bom_component1
   
     precondition ($ctx_tenant != null) {
@@ -24,7 +24,7 @@ query "product_bom_component/{bom_id}" verb=POST {
       error = "BOM not found"
     }
   
-    precondition ($product_bom_component1.component_id != $input.component_id) {
+    precondition ($product_bom_component1 == null) {
       error_type = "badrequest"
       error = "Component already exists in BoM"
     }
