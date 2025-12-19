@@ -68,7 +68,7 @@ query "product_bom_component/{bom_id}" verb=POST {
             component_id     : $input.component_id
             quantity_per_unit: $input.quantity_per_unit
           }
-        } as $product_bom_component3
+        } as $product_bom_component
       }
     }
   
