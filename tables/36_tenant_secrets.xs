@@ -4,6 +4,10 @@ table tenant_secrets {
   schema {
     int id
     timestamp created_at?=now
+    text shopify_token? filters=trim
+    int tenant_id {
+      table = "tenant"
+    }
   }
 
   index = [
