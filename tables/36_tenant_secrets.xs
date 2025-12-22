@@ -4,7 +4,10 @@ table tenant_secrets {
   schema {
     int id
     timestamp created_at?=now
-    text shopify_token? filters=trim
+    text shopify_token? filters=trim {
+      sensitive = true
+    }
+  
     int tenant_id {
       table = "tenant"
     }
