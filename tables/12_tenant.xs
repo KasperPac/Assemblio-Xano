@@ -13,10 +13,6 @@ table tenant {
     enum Plan? {
       values = ["Lite", "Starter", "Professional", "Enterprise"]
     }
-  
-    password token? {
-      sensitive = true
-    }
   }
 
   index = [

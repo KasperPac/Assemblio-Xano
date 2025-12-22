@@ -62,7 +62,7 @@ query "component/{component_id}/adjust-stock" verb=POST {
         }
       
         var.update $AdjustType {
-          value = "+" | concat: $input.quantity_delta
+          value = `"+" | concat: $input.quantity_delta`
         }
       }
     
@@ -72,7 +72,7 @@ query "component/{component_id}/adjust-stock" verb=POST {
         }
       
         var.update $AdjustType {
-          value = "-" | concat: $input.quantity_delta
+          value = `"-" | concat: $input.quantity_delta`
         }
       }
     }
