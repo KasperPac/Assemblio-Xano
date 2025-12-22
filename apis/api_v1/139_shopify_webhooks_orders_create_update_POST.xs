@@ -14,11 +14,11 @@ query "shopify/webhooks/orders_create_update" verb=POST {
       value = $env.$http_headers|json_decode
     }
   
-    !var $shop_domain {
+    var $shop_domain {
       value = $env.$http_headers.X-Shopify-Shop-Domain
     }
   
-    var $shop_domain {
+    !var $shop_domain {
       value = "dibble-foods.myshopify.com"
     }
   
