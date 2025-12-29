@@ -4,11 +4,22 @@ function resolve_tenant {
   }
 
   stack {
-    db.query "" {
+    !db.query "" {
       join = {
         user_role: {
           table: ""
           where: $input.user_id == $db.user_tenant_role.user_id
+        }
+      }
+    
+      return = {type: "list"}
+    } as $user_role
+  
+    db.query user_tenant_role {
+      join = {
+        user: {
+          table: "user"
+          where: $db.user.id == $db.user_tenant_role.user_id
         }
       }
     
