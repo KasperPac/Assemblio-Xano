@@ -26,6 +26,11 @@ function resolve_tenant {
       return = {type: "list"}
     } as $user_role
   
+    db.query user {
+      where = $db.user.id == $input.user_id
+      return = {type: "single"}
+    } as $user1
+  
     conditional {
       if ($user_role == null) {
         var $OutputVar {
@@ -35,7 +40,7 @@ function resolve_tenant {
     
       else {
         var $ctx_tenant_id {
-          value = $user_role.0.tenant_id
+          value = $user1.current_tenant
         }
       
         var $ctx_role_id {
