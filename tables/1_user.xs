@@ -26,6 +26,9 @@ table user {
   
     timestamp? Last_Login?
     timestamp updated_at?
+    int current_tenant? {
+      table = "tenant"
+    }
   }
 
   index = [
