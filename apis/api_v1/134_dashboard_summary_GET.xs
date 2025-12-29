@@ -139,7 +139,7 @@ query dashboard_summary verb=GET {
           value = {
             Type    : "Missing_BOM"
             Title   : "Missing BOM Alert"
-            Message : ($products_missing_bom_count|to_text) ~ " Variants are missing a BOM"
+            Message : ($products_missing_bom_count|to_text) ~ " Products on active orders are missing a BOM"
             Severity: "Warning"
           }
         }
