@@ -4,10 +4,10 @@ function resolve_tenant {
   }
 
   stack {
-    !db.query user_tenant_role {
+    db.query "" {
       join = {
         user_role: {
-          table: "user_tenant_role"
+          table: ""
           where: $input.user_id == $db.user_tenant_role.user_id
         }
       }
@@ -15,13 +15,8 @@ function resolve_tenant {
       return = {type: "list"}
     } as $user_role
   
-    db.query user {
-      where = $db.user.id == $input.user_id
-      return = {type: "list"}
-    } as $user1
-  
     conditional {
-      if ($user1 == null) {
+      if ($user_role == null) {
         var $OutputVar {
           value = "{\n  \"error\": \"User has no tenant configured\"\n}"
         }
@@ -29,15 +24,29 @@ function resolve_tenant {
     
       else {
         var $ctx_tenant_id {
-          value = $user1.current_tenant
+          value = $user_role.0.tenant_id
+        }
+      
+        var $ctx_role_id {
+          value = $user_role.0.role_id
         }
       
         var $OutputVar {
-          value = {tenant_id: $ctx_tenant_id}
+          value = {
+            tenant_id: $ctx_tenant_id
+            role_id  : $ctx_role_id
+            role_code: $ctx_role_code
+          }
         }
       }
     }
   }
 
-  response = $OutputVar
+  response = {
+    self: ```
+      {
+        "message": $OutputVar
+      }
+      ```
+  }
 }
