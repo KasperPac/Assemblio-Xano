@@ -39,11 +39,5 @@ function resolve_tenant {
     }
   }
 
-  response = {
-    self: ```
-      {
-        "message": $OutputVar
-      }
-      ```
-  }
+  response = $OutputVar
 }
