@@ -7,7 +7,7 @@ query "auth/me" verb=GET {
   }
 
   stack {
-    db.get user {
+    !db.get user {
       field_name = "id"
       field_value = $auth.id
       output = [
@@ -20,6 +20,23 @@ query "auth/me" verb=GET {
         "updated_at"
         "Avatar.url"
       ]
+    } as $user
+  
+    function.run resolve_tenant {
+      input = {user_id: $auth.id}
+    } as $ctx_tenant
+  
+    db.query user {
+      join = {
+        user_tenant_role: {
+          table: "user_tenant_role"
+          where: $db.user_tenant_role.user_id == $auth.id
+        }
+      }
+    
+      where = $db.user_tenant_role.tenant_id == $ctx_tenant.self.message.tenant_id
+      eval = {role_id: $db.user_tenant_role.role_id}
+      return = {type: "single"}
     } as $user
   
     db.query user_tenant_role {
