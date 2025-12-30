@@ -34,7 +34,7 @@ query "auth/me" verb=GET {
         }
       }
     
-      where = $db.user_tenant_role.tenant_id == $ctx_tenant.self.message.tenant_id
+      where = $db.user_tenant_role.tenant_id == $ctx_tenant.self.message.tenant_id && $db.user.id == $auth.id
       eval = {role_id: $db.user_tenant_role.role_id}
       return = {type: "single"}
     } as $user
