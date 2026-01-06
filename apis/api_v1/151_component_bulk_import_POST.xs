@@ -72,8 +72,8 @@ query "component/bulk-import" verb=POST {
                 tenant_id      : $ctx_tenant.self.message.tenant_id
                 component_id   : $new_component.id
                 location_id    : $default_location.id
-                on_hand_qty    : 0
-                in_progress_qty: 0
+                on_hand_qty    : $row.on_hand
+                in_progress_qty: $row.in_progress
                 shipped_qty    : 0
                 updated_at     : "now"
               }
