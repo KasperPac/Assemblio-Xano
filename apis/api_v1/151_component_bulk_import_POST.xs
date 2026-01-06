@@ -27,7 +27,7 @@ query "component/bulk-import" verb=POST {
   
     // Parse the CSV data directly from the uploaded file
     stream.from_csv {
-      value = $input.csv_file2
+      value = $input.csv_file
       separator = ","
       enclosure = '"'
       escape_char = '"'
@@ -57,7 +57,6 @@ query "component/bulk-import" verb=POST {
                 description        : $row.description
                 unit_of_measure    : $row.unit_of_measure
                 cost_per_unit      : $row.cost_per_unit
-                no_depreciate      : $row.no_depreciate
                 default_location_id: $default_location.id
                 reorder_point      : $row.reorder_point
                 preferred_supplier : $row.preferred_supplier
