@@ -95,7 +95,7 @@ query component verb=GET {
             }
             component_group  : {
               table: "component_group"
-              type : "right"
+              type : "left"
               where: $db.component.component_group_id == $db.component_group.id
             }
           }
