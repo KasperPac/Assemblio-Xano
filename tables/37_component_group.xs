@@ -9,6 +9,7 @@ table component_group {
     }
   
     text Group? filters=trim
+    text Code? filters=trim
   }
 
   index = [
