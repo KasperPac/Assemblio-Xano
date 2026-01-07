@@ -10,6 +10,7 @@ table component_group {
     }
   
     timestamp created_at?=now
+    text Description? filters=trim
   }
 
   index = [
