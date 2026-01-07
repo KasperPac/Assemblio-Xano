@@ -27,6 +27,7 @@ query component verb=POST {
     int? cost_per_item?
     bool no_depreciate?
     bool modify?
+    int? group?
   }
 
   stack {
@@ -95,6 +96,7 @@ query component verb=POST {
         tenant_id          : $ctx_tenant.self.message.tenant_id
         name               : $input.name
         description        : $input.description
+        component_group_id : $input.group
         unit_of_measure    : $input.unit_of_measure
         cost_per_unit      : $input.cost_per_item
         no_depreciate      : $input.no_depreciate
