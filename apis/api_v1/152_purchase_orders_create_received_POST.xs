@@ -73,7 +73,17 @@ query "purchase_orders/create_received" verb=POST {
       value = $component_map_entries|create_object_from_entries
     }
   
-    storage.create_attachment {
+    conditional {
+      if ($input.delivery_docket != "NULL") {
+        storage.create_attachment {
+          value = $input.delivery_docket
+          access = "public"
+          filename = ""
+        } as $delivery_docket
+      }
+    }
+  
+    !storage.create_attachment {
       value = $input.delivery_docket
       access = "public"
       filename = ""
