@@ -93,7 +93,11 @@ query component verb=GET {
               type : "left"
               where: $db.component.id == $db.inventory_balance.component_id
             }
-            component_group  : {table: "component_group", type: "left"}
+            component_group  : {
+              table: "component_group"
+              type : "left"
+              where: $db.component.component_group_id == $db.component_group.id
+            }
           }
         
           where = $db.component.tenant_id == $func1.self.message.tenant_id && $db.component.default_location_id ==? $input.location_id && ($db.component.sku includes? $input.search || $db.component.name includes? $input.search || $db.component.description includes? $input.search)
