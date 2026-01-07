@@ -3,13 +3,13 @@ table component_group {
 
   schema {
     int id
-    timestamp created_at?=now
+    text Name? filters=trim
+    text Code? filters=trim
     int tenant_id? {
       table = "tenant"
     }
   
-    text Group? filters=trim
-    text Code? filters=trim
+    timestamp created_at?=now
   }
 
   index = [
