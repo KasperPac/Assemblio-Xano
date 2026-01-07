@@ -7,6 +7,8 @@ table component_group {
     int tenant_id? {
       table = "tenant"
     }
+  
+    text Group? filters=trim
   }
 
   index = [
