@@ -25,10 +25,15 @@ query component verb=GET {
               table: "inventory_balance"
               where: $db.component.id == $db.inventory_balance.component_id
             }
+            component_group  : {
+              table: "component_group"
+              where: $db.component.component_group_id == $db.component_group.id
+            }
           }
         
           where = ($db.component.sku includes? $input.search || $db.component.name includes? $input.search || $db.component.description includes? $input.search) && $db.component.default_location_id ==? $input.location_id && $db.component.tenant_id == $func1.self.message.tenant_id && $db.inventory_balance.on_hand_qty <= $db.component.reorder_point
           additional_where = $input.search
+          eval = {group: $db.component_group.Name}
           return = {
             type  : "list"
             paging: {page: $input.page, per_page: 25, totals: true}
@@ -88,10 +93,15 @@ query component verb=GET {
               type : "left"
               where: $db.component.id == $db.inventory_balance.component_id
             }
+            component_group  : {
+              table: "component_group"
+              where: $db.component.component_group_id == $db.component_group.id
+            }
           }
         
           where = $db.component.tenant_id == $func1.self.message.tenant_id && $db.component.default_location_id ==? $input.location_id && ($db.component.sku includes? $input.search || $db.component.name includes? $input.search || $db.component.description includes? $input.search)
           additional_where = $input.search
+          eval = {group: $db.component_group.Name}
           return = {
             type  : "list"
             paging: {page: $input.page, per_page: 25, totals: true}
