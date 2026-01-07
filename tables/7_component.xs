@@ -11,6 +11,10 @@ table component {
     text sku?
     text name?
     text description?
+    int component_group_id? {
+      table = "component_group"
+    }
+  
     text unit_of_measure?
     decimal cost_per_unit?
     bool no_depreciate?
@@ -22,9 +26,6 @@ table component {
     text preferred_supplier?
     bool is_active?
     timestamp updated_at?
-    int component_group_id? {
-      table = "component_group"
-    }
   }
 
   index = [
