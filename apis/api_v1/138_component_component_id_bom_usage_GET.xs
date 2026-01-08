@@ -9,7 +9,10 @@ query "component/{component_id}/bom-usage" verb=GET {
   }
 
   stack {
-    function.run resolve_tenant as $tenant_id
+    function.run resolve_tenant {
+      input = {user_id: $auth.id}
+    } as $tenant_id
+  
     db.query product_bom_component {
       where = $db.product_bom_component.component_id == $input.component_id && "" == ""
       return = {type: "list"}
