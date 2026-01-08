@@ -73,26 +73,48 @@ query "purchase_orders/create_received" verb=POST {
       value = $component_map_entries|create_object_from_entries
     }
   
-    !storage.create_attachment {
-      value = $input.delivery_docket
-      access = "public"
-      filename = ""
-    } as $delivery_docket
-  
-    db.add purchase_order {
-      data = {
-        created_at     : "now"
-        updated_at     : "now"
-        tenant         : $tenant_id
-        created_by_user: $auth.id
-        po_number      : $input.po_number
-        status         : "RECEIVED"
-        supplier_name  : $input.supplier_name
-        notes          : $input.notes
-        order_date     : $input.order_date
-        delivery_date  : $input.delivery_date
+    conditional {
+      if ($input.delivery_docket != null) {
+        storage.create_attachment {
+          value = $input.delivery_docket
+          access = "public"
+          filename = ""
+        } as $delivery_docket
+      
+        db.add purchase_order {
+          data = {
+            created_at      : "now"
+            updated_at      : "now"
+            tenant          : $tenant_id
+            created_by_user : $auth.id
+            po_number       : $input.po_number
+            status          : "RECEIVED"
+            supplier_name   : $input.supplier_name
+            notes           : $input.notes
+            order_date      : $input.order_date
+            delivery_date   : $input.delivery_date
+            delivery_receipt: $delivery_docket
+          }
+        } as $po
       }
-    } as $po
+    
+      else {
+        db.add purchase_order {
+          data = {
+            created_at     : "now"
+            updated_at     : "now"
+            tenant         : $tenant_id
+            created_by_user: $auth.id
+            po_number      : $input.po_number
+            status         : "RECEIVED"
+            supplier_name  : $input.supplier_name
+            notes          : $input.notes
+            order_date     : $input.order_date
+            delivery_date  : $input.delivery_date
+          }
+        } as $po
+      }
+    }
   
     var $po_lines {
       value = []
