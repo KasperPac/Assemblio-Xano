@@ -77,7 +77,7 @@ query "shopify/webhooks/orders_create_update" verb=POST {
     }
   
     var $total_price {
-      value = $order_raw.total_price
+      value = $order_raw.subtotal_price
     }
   
     var $customer_name {
