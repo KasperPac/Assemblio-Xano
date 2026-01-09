@@ -12,6 +12,7 @@ table suppliers {
     text name? filters=trim
     text address_line1? filters=trim
     text address_line2? filters=trim
+    text city? filters=trim
   }
 
   index = [
