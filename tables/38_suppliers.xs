@@ -16,6 +16,7 @@ table suppliers {
     text state? filters=trim
     text postcode? filters=trim
     text country? filters=trim
+    text contact_person? filters=trim
   }
 
   index = [
