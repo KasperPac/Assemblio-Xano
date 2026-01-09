@@ -27,9 +27,6 @@ table purchase_order {
       values = ["DRAFT", "ORDERED", "PARTIAL_RECEIVED", "RECEIVED", "CANCELLED"]
     }
   
-    // Name of the supplier for this purchase order, for future UI use.
-    text supplier_name? filters=trim
-  
     // Additional notes related to the purchase order.
     text notes? filters=trim
   
