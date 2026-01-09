@@ -33,6 +33,9 @@ table purchase_order {
     date? order_date?
     date? delivery_date?
     attachment? delivery_receipt?
+    int suppliers_id? {
+      table = "suppliers"
+    }
   }
 
   index = [
