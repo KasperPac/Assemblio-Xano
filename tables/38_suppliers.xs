@@ -13,6 +13,9 @@ table suppliers {
     text address_line1? filters=trim
     text address_line2? filters=trim
     text city? filters=trim
+    text state? filters=trim
+    text postcode? filters=trim
+    text country? filters=trim
   }
 
   index = [
