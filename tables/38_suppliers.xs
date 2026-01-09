@@ -10,6 +10,8 @@ table suppliers {
   
     text code? filters=trim
     text name? filters=trim
+    text address_line1? filters=trim
+    text address_line2? filters=trim
   }
 
   index = [
