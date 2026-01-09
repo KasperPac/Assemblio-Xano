@@ -19,6 +19,7 @@ table suppliers {
     text contact_person? filters=trim
     email contact_email? filters=trim|lower
     text contact_phone? filters=trim
+    bool is_active?
   }
 
   index = [
