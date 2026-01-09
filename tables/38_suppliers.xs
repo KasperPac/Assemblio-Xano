@@ -18,6 +18,7 @@ table suppliers {
     text country? filters=trim
     text contact_person? filters=trim
     email contact_email? filters=trim|lower
+    text contact_phone? filters=trim
   }
 
   index = [
