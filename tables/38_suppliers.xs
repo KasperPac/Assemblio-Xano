@@ -17,6 +17,7 @@ table suppliers {
     text postcode? filters=trim
     text country? filters=trim
     text contact_person? filters=trim
+    email contact_email? filters=trim|lower
   }
 
   index = [
