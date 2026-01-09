@@ -7,6 +7,9 @@ table suppliers {
     int tenant_id? {
       table = "tenant"
     }
+  
+    text code? filters=trim
+    text name? filters=trim
   }
 
   index = [
