@@ -1,4 +1,4 @@
-query "supliers/new" verb=POST {
+query "suppliers/new" verb=POST {
   api_group = "api_v1"
   auth = "user"
 
