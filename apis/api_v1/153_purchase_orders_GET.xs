@@ -11,7 +11,16 @@ query purchase_orders verb=GET {
     } as $ctx_tenant
   
     db.query purchase_order {
+      join = {
+        suppliers: {
+          table: "suppliers"
+          type : "left"
+          where: $db.purchase_order.suppliers_id == $db.suppliers.id
+        }
+      }
+    
       where = $db.purchase_order.tenant == $ctx_tenant.self.message.tenant_id
+      eval = {supplier_name: $db.suppliers.name}
       return = {type: "list"}
     } as $purchase_order1
   }
