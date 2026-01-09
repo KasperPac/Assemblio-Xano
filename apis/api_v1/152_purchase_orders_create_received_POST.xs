@@ -5,7 +5,6 @@ query "purchase_orders/create_received" verb=POST {
 
   input {
     text po_number filters=trim
-    text supplier_name? filters=trim
     text notes? filters=trim
     object[] components {
       schema {
@@ -23,6 +22,7 @@ query "purchase_orders/create_received" verb=POST {
     date? order_date?
     date? delivery_date?
     file? delivery_docket?
+    int supplier?
   }
 
   stack {
@@ -89,10 +89,10 @@ query "purchase_orders/create_received" verb=POST {
             created_by_user : $auth.id
             po_number       : $input.po_number
             status          : "RECEIVED"
-            supplier_name   : $input.supplier_name
             notes           : $input.notes
             order_date      : $input.order_date
             delivery_date   : $input.delivery_date
+            suppliers_id    : $input.supplier
             delivery_receipt: $delivery_docket
           }
         } as $po
@@ -107,10 +107,10 @@ query "purchase_orders/create_received" verb=POST {
             created_by_user: $auth.id
             po_number      : $input.po_number
             status         : "RECEIVED"
-            supplier_name  : $input.supplier_name
             notes          : $input.notes
             order_date     : $input.order_date
             delivery_date  : $input.delivery_date
+            suppliers_id   : $input.supplier
           }
         } as $po
       }
