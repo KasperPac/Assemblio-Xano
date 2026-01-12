@@ -19,7 +19,16 @@ query "purchase_orders/{order_id}" verb=GET {
   
     // Verify the purchase order exists and belongs to the user's tenant
     db.query purchase_order {
+      join = {
+        supplier: {
+          table: "suppliers"
+          type : "left"
+          where: $db.purchase_order.suppliers_id == $db.supplier.id
+        }
+      }
+    
       where = $db.purchase_order.id == $input.order_id && $db.purchase_order.tenant == $tenant_id
+      eval = {supplier_name: $db.supplier.name}
       return = {type: "single"}
     } as $purchase_order
   
