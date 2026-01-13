@@ -27,7 +27,13 @@ query user verb=GET {
       where = $db.user_tenant_role.tenant_id == $ctx_tenant.self.message.tenant_id
       eval = {role_id: $db.user_tenant_role.role_id}
       return = {type: "list"}
-      addon = [{name: "role", input: {role_id: ""}, as: "_role"}]
+      addon = [
+        {
+          name : "role"
+          input: {role_id: $output.role_id}
+          as   : "_role"
+        }
+      ]
     } as $users
   }
 
