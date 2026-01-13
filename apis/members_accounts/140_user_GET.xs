@@ -19,6 +19,7 @@ query user verb=GET {
         }
         role            : {
           table: "role"
+          type : "left"
           where: $db.user_tenant_role.id == $db.role.id
         }
       }
