@@ -17,9 +17,14 @@ query user verb=GET {
           table: "user_tenant_role"
           where: $db.user.id == $db.user_tenant_role.user_id
         }
+        role            : {
+          table: "role"
+          where: $db.user_tenant_role.id == $db.role.id
+        }
       }
     
       where = $db.user_tenant_role.tenant_id == $ctx_tenant.self.message.tenant_id
+      eval = {role: $db.role.name}
       return = {type: "list"}
     } as $users
   }
