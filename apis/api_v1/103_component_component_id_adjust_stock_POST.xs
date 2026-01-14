@@ -116,6 +116,7 @@ query "component/{component_id}/adjust-stock" verb=POST {
         entity_type: "COMONENT"
         entity_id  : 0
         message    : ["Component",$component_record.0.name,"stock levels adjusted by",$input.quantity_delta]|join:" "
+        RawData    : [$var.balance]|append:$var.inventory_balance1
       }
     } as $activity_log1
   }
