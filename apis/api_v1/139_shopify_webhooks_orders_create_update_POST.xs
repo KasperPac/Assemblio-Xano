@@ -509,7 +509,9 @@ query "shopify/webhooks/orders_create_update" verb=POST {
         event_type : "New Order"
         entity_type: "Order"
         entity_id  : $response_payload.data.order_id
-        message    : ["New Order",$new_line.order_id,"Imported from Shopify"]|join:" "
+        message    : ```
+          ["New Order",$var.order_record.shopify_order_id,"Imported from Shopify"]|join:" "
+          ```
         RawData    : `$input`
       }
     } as $activity_log1
