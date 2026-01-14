@@ -506,6 +506,7 @@ query "shopify/webhooks/orders_create_update" verb=POST {
       data = {
         created_at : "now"
         tenant_id  : $tenant_id
+        user_id    : 11
         event_type : "New Order"
         entity_type: "Order"
         entity_id  : $response_payload.data.order_id
