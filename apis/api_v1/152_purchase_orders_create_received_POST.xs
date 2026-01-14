@@ -240,12 +240,14 @@ query "purchase_orders/create_received" verb=POST {
   
     db.add activity_log {
       data = {
+        created_at : "now"
         tenant_id  : $tenant_id
         user_id    : $auth.id
         event_type : "PURCHASE_ORDER_CREATED"
         entity_type: "purchase_order"
         entity_id  : $po.id
         message    : "Created received purchase order " ~ $po.po_number
+        RawData    : [$var.po]|append:$var.po_lines
       }
     }
   
