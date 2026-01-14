@@ -62,6 +62,19 @@ query "products/bom/copy" verb=POST {
         }
       }
     }
+  
+    db.add activity_log {
+      data = {
+        created_at : "now"
+        tenant_id  : $ctx_tenant.self.message.tenant_id
+        user_id    : $auth.id
+        event_type : "BoM Coppied"
+        entity_type: "BoM"
+        entity_id  : $new_bom.id
+        message    : [$var.source_bom.shopify_variant_id,"Coppied to",$var.new_bom.shopify_variant_id]|join:" "
+        RawData    : [$var.source_bom]|append:$var.new_bom
+      }
+    } as $activity_log1
   }
 
   response = {
