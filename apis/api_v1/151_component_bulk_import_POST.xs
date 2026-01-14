@@ -79,6 +79,10 @@ query "component/bulk-import" verb=POST {
               }
             }
           
+            db.query inventory_balance {
+              return = {type: "list"}
+            } as $inventory_balance
+          
             // Log activity
             db.add activity_log {
               data = {
@@ -89,6 +93,11 @@ query "component/bulk-import" verb=POST {
                 entity_type: "COMPONENT"
                 entity_id  : $new_component.id
                 message    : "Bulk Import: Component " ~ $new_component.name ~ " Added"
+                RawData    : ```
+                  
+                  
+                  [$var.new_component]|append:$var.inventory_balance
+                  ```
               }
             }
           
