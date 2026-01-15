@@ -5,7 +5,7 @@ query "products/shopify/import" verb=POST {
 
   input {
     // The internal ID of the Shopify store to sync
-    int store_id {
+    int store_id? {
       table = "shopify_store"
     }
   }
