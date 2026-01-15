@@ -69,9 +69,19 @@ query "products/shopify/import" verb=POST {
             |to_int
         }
       
-        // Safely extract image URL
-        var $image_url {
-          value = $current_product.featuredMedia.preview.image.url
+        conditional {
+          if ($current_product.featuredMedia != null) {
+            // Safely extract image URL
+            var $image_url {
+              value = $current_product.featuredMedia.preview.image.url
+            }
+          }
+        
+          else {
+            var $image_url {
+              value = ""
+            }
+          }
         }
       
         // Check if the product already exists in the local database
