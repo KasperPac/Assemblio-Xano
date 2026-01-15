@@ -40,7 +40,7 @@ query "products/shopify/import" verb=POST {
   
     // GraphQL Query to fetch products and variants
     var $graphql_query {
-      value = "{ products(first: 250) { nodes { id title description featuredMedia { preview { image { url } } } onlineStorePreviewUrl options(first: 250) { id name } variants(first: 250) { nodes { id title price sku selectedOptions { name value } } } } } }"
+      value = "{ products(first: 250) { nodes { id title status description featuredMedia { preview { image { url } } } onlineStorePreviewUrl options(first: 250) { id name } variants(first: 250) { nodes { id title price sku selectedOptions { name value } } } } } }"
     }
   
     // Fetch products from Shopify Admin API using GraphQL
@@ -91,7 +91,9 @@ query "products/shopify/import" verb=POST {
                 shopify_store_id  : $store.store_id
                 shopify_product_id: $shopify_product_id
                 title             : $current_product.title
+                status            : $current_product.status
                 iamge_url         : $image_url
+                updated_at        : now
               }
             } as $product_record
           }
@@ -104,9 +106,9 @@ query "products/shopify/import" verb=POST {
                 shopify_store_id  : $store.store_id
                 shopify_product_id: $shopify_product_id
                 title             : $current_product.title
-                status            : ""
+                status            : $current_product.status
                 iamge_url         : $image_url
-                updated_at        : ""
+                updated_at        : now
               }
             } as $product_record
           }
