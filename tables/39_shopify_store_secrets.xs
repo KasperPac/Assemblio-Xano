@@ -12,6 +12,7 @@ table shopify_store_secrets {
     text scopes? filters=trim
     timestamp? installed_at?
     text? state? filters=trim
+    timestamp? updated_at?
   }
 
   index = [
