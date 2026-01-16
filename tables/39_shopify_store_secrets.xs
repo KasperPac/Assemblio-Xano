@@ -10,6 +10,8 @@ table shopify_store_secrets {
   
     text access_token? filters=trim
     text scopes? filters=trim
+    timestamp? installed_at?
+    text? state? filters=trim
   }
 
   index = [
