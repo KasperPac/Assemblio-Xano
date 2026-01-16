@@ -7,6 +7,9 @@ table shopify_store_secrets {
     int shopify_store_id? {
       table = "shopify_store"
     }
+  
+    text access_token? filters=trim
+    text scopes? filters=trim
   }
 
   index = [
