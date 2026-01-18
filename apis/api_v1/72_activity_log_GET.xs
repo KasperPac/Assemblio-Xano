@@ -4,6 +4,8 @@ query activity_log verb=GET {
   auth = "user"
 
   input {
+    int page?
+    text search? filters=trim
   }
 
   stack {
@@ -13,12 +15,17 @@ query activity_log verb=GET {
   
     db.query activity_log {
       where = $db.activity_log.tenant_id == $ctx_tenant.self.message.tenant_id
-      return = {type: "list"}
+      additional_where = $input.search
+      return = {
+        type  : "list"
+        paging: {page: $input.page, per_page: 100, totals: true}
+      }
+    
       addon = [
         {
           name : "user"
           input: {user_id: $output.user_id}
-          as   : "_user"
+          as   : "items._user"
         }
       ]
     } as $activity_log
