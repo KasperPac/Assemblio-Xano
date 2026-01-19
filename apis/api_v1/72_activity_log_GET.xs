@@ -14,7 +14,7 @@ query activity_log verb=GET {
     } as $ctx_tenant
   
     db.query activity_log {
-      where = $db.activity_log.tenant_id == $ctx_tenant.self.message.tenant_id && ($db.activity_log.user_id contains? $input.search || $db.activity_log.message includes $input.search)
+      where = $db.activity_log.tenant_id == $ctx_tenant.self.message.tenant_id && ($db.activity_log.user_id contains? $input.search || $db.activity_log.message includes? $input.search)
       additional_where = $input.search
       return = {
         type  : "list"
