@@ -16,6 +16,9 @@ query "purchase_orders/create_received" verb=POST {
         int location_id? {
           table = "location"
         }
+      
+        decimal Line_Price?
+        decimal Price_Per_Item?
       }
     }
   
@@ -23,6 +26,7 @@ query "purchase_orders/create_received" verb=POST {
     date? delivery_date?
     file? delivery_docket?
     int supplier?
+    bool update_ppu?
   }
 
   stack {
@@ -128,6 +132,29 @@ query "purchase_orders/create_received" verb=POST {
           value = $indexed_components|get:($item.component_id|to_text)
         }
       
+        conditional {
+          if ($input.components.update_ppu) {
+            db.edit component {
+              field_name = "id"
+              field_value = $comp.id
+              data = {cost_per_unit: $item.Price_Per_Item}
+            } as $component1
+          
+            db.add activity_log {
+              data = {
+                created_at : "now"
+                tenant_id  : $ctx_tenant.self.message.tenant_id
+                user_id    : $auth.id
+                event_type : "Component Modified"
+                entity_type: "Component"
+                entity_id  : $item.component_id
+                message    : ["Component",$input.components.SKU,"PPU updated to",$input.components.Price_Per_Item,"From purchase order",$input.po_number]|join:" "
+                RawData    : $item.Price_Per_Item
+              }
+            }
+          }
+        }
+      
         var $target_location_id {
           value = $item.location_id != null ? $item.location_id : $comp.default_location_id
         }
@@ -142,6 +169,7 @@ query "purchase_orders/create_received" verb=POST {
             quantity_ordered : $item.quantity
             quantity_received: $item.quantity
             location         : $target_location_id
+            unit_cost        : $item.Price_Per_Item
           }
         } as $line
       
