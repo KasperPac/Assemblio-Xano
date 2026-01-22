@@ -21,6 +21,7 @@ query activity_log verb=GET {
     db.query activity_log {
       where = $db.activity_log.tenant_id == $ctx_tenant.self.message.tenant_id && ($db.activity_log.message includes? $input.filters.search || $db.activity_log.user_id ==? $input.filters.user)
       additional_where = $input.search
+      sort = {activity_log.id: "desc"}
       return = {
         type  : "list"
         paging: {page: $input.page, per_page: 100, totals: true}
