@@ -149,7 +149,10 @@ query "purchase_orders/create_received" verb=POST {
                 entity_type: "Component"
                 entity_id  : $item.component_id
                 message    : ["Component",$input.components.SKU,"PPU updated to",$input.components.Price_Per_Item,"From purchase order",$input.po_number]|join:" "
-                RawData    : $item.Price_Per_Item
+                RawData    : ```
+                  
+                  [$input,$var.item,$var.line]
+                  ```
               }
             }
           }
