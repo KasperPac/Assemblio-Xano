@@ -12,6 +12,7 @@ table shopify_connections {
     text access_token? filters=trim
     text scopes? filters=trim
     text status? filters=trim
+    timestamp? installed_at?
   }
 
   index = [
