@@ -10,6 +10,7 @@ table shopify_connections {
   
     text shop_domain? filters=trim
     text access_token? filters=trim
+    text scopes? filters=trim
   }
 
   index = [
