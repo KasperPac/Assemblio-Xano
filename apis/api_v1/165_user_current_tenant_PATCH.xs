@@ -14,5 +14,5 @@ query "user/current_tenant" verb=PATCH {
     }
   }
 
-  response = $""
+  response = $[""]
 }

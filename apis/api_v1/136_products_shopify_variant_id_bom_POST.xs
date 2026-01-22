@@ -142,5 +142,5 @@ query "products/{shopify_variant_id}/bom" verb=POST {
     } as $activity_log1
   }
 
-  response = $response
+  response = $var.response
 }
