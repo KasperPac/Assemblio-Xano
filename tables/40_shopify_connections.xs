@@ -7,6 +7,8 @@ table shopify_connections {
     int tenant_id? {
       table = "tenant"
     }
+  
+    text shop_domain? filters=trim
   }
 
   index = [
