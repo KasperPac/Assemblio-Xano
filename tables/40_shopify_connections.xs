@@ -13,6 +13,7 @@ table shopify_connections {
     text scopes? filters=trim
     text status? filters=trim
     timestamp? installed_at?
+    timestamp? updated_at?
   }
 
   index = [
