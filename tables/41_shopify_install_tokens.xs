@@ -7,6 +7,8 @@ table shopify_install_tokens {
     int tenant_id? {
       table = "tenant"
     }
+  
+    text install_token? filters=trim
   }
 
   index = [
