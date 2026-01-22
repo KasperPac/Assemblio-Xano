@@ -4,6 +4,9 @@ table shopify_connections {
   schema {
     int id
     timestamp created_at?=now
+    int tenant_id? {
+      table = "tenant"
+    }
   }
 
   index = [
