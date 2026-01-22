@@ -10,6 +10,7 @@ table shopify_install_tokens {
   
     text install_token? filters=trim
     timestamp expires_at?
+    timestamp used_at?
   }
 
   index = [
