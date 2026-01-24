@@ -19,7 +19,7 @@ query "products/{variant_id}/bom" verb=GET {
         }
       }
     
-      where = $db.product_bom.tenant_id == $ctx_tenant.self.message.tenant_id && $db.shopify_variant.shopify_variant_id == $input.shopify_variant_id
+      where = $db.product_bom.tenant_id == $ctx_tenant.self.message.tenant_id && $db.shopify_variant.shopify_variant_id == $input.shopify_variant_id && $db.product_bom.deleted == false
       return = {type: "list"}
       addon = [
         {
