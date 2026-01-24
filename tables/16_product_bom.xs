@@ -19,6 +19,8 @@ table product_bom {
     int created_by_user_id? {
       table = "user"
     }
+  
+    bool deleted?
   }
 
   index = [
