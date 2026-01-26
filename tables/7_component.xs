@@ -26,6 +26,7 @@ table component {
     text preferred_supplier?
     bool is_active?
     timestamp updated_at?
+    bool deleted?
   }
 
   index = [
