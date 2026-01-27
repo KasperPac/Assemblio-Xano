@@ -31,7 +31,7 @@ query component verb=GET {
             }
           }
         
-          where = ($db.component.sku includes? $input.search || $db.component.name includes? $input.search || $db.component.description includes? $input.search) && $db.component.default_location_id ==? $input.location_id && $db.component.tenant_id == $func1.self.message.tenant_id && $db.inventory_balance.on_hand_qty <= $db.component.reorder_point
+          where = ($db.component.sku includes? $input.search || $db.component.name includes? $input.search || $db.component.description includes? $input.search) && $db.component.default_location_id ==? $input.location_id && $db.component.tenant_id == $func1.self.message.tenant_id && $db.inventory_balance.on_hand_qty <= $db.component.reorder_point && $db.component.deleted != true
           additional_where = $input.search
           eval = {group: $db.component_group.Name}
           return = {
@@ -65,7 +65,7 @@ query component verb=GET {
             }
           }
         
-          where = $db.component.tenant_id == $func1.self.message.tenant_id && $db.component.default_location_id ==? $input.location_id && ($db.component.sku includes? $input.search || $db.component.name includes? $input.search || $db.component.description includes? $input.search) && $db.inventory_balance.on_hand_qty <= 0
+          where = $db.component.tenant_id == $func1.self.message.tenant_id && $db.component.default_location_id ==? $input.location_id && ($db.component.sku includes? $input.search || $db.component.name includes? $input.search || $db.component.description includes? $input.search) && $db.inventory_balance.on_hand_qty <= 0 && $db.component.deleted != true
           additional_where = $input.search
           return = {type: "list", paging: {page: $input.page, per_page: 25}}
           addon = [
@@ -100,7 +100,7 @@ query component verb=GET {
             }
           }
         
-          where = $db.component.tenant_id == $func1.self.message.tenant_id && $db.component.default_location_id ==? $input.location_id && ($db.component.sku includes? $input.search || $db.component.name includes? $input.search || $db.component.description includes? $input.search)
+          where = $db.component.tenant_id == $func1.self.message.tenant_id && $db.component.default_location_id ==? $input.location_id && ($db.component.sku includes? $input.search || $db.component.name includes? $input.search || $db.component.description includes? $input.search) && $db.component.deleted != true
           additional_where = $input.search
           eval = {group: $db.component_group.Name}
           return = {
