@@ -115,6 +115,23 @@ query dashboard_summary verb=GET {
       }
     }
   
+    db.query order {
+      join = {
+        order_line: {
+          table: "order_line"
+          where: $db.order.id == $db.order_line.order_id
+        }
+      }
+    
+      where = $db.order.tenant_id == $ctx_tenant.self.message.tenant_id
+      eval = {
+        variant_title: $db.order_line.variant_title
+        title        : $db.order_line.title
+      }
+    
+      return = {type: "list"}
+    } as $orders
+  
     // Construct Alerts Array
     var $alerts {
       value = []
