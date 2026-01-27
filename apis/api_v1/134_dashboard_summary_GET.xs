@@ -185,5 +185,6 @@ query dashboard_summary verb=GET {
     stock_on_hand_value       : $stock_on_hand_value
     stock_in_prod_value       : $stock_in_prod_value
     alerts                    : $alerts
+    orders                    : $orders
   }
 }
