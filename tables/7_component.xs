@@ -27,6 +27,7 @@ table component {
     bool is_active?
     timestamp updated_at?
     bool deleted?
+    timestamp? deleted_at?
   }
 
   index = [
