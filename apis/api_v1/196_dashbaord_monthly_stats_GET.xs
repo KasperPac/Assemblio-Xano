@@ -103,18 +103,57 @@ query "dashbaord/monthly_stats" verb=GET {
       }
     }
   
-    var $monthly_stats {
+    var $labels {
+      value = []
+    }
+  
+    var $placed_data {
+      value = []
+    }
+  
+    var $fulfilled_data {
       value = []
     }
   
     foreach ($month_keys) {
       each as $key {
-        array.push $monthly_stats {
+        var $entry {
           value = $stats_map|get:$key
+        }
+      
+        array.push $labels {
+          value = $entry.start_date|format_timestamp:"M Y"
+        }
+      
+        array.push $placed_data {
+          value = $entry.placed_orders
+        }
+      
+        array.push $fulfilled_data {
+          value = $entry.fulfilled_orders
         }
       }
     }
+  
+    var $datasets {
+      value = [
+        {
+          label: "Placed Orders",
+          backgroundColor: "rgb(255, 99, 132)",
+          data: $placed_data
+        },
+        {
+          label: "Fulfilled Orders",
+          backgroundColor: "rgb(54, 162, 235)",
+          data: $fulfilled_data
+        }
+      ]
+    }
+  
+    var $chart_response {
+      value = {labels: $labels, datasets: $datasets}
+    }
   }
 
-  response = $monthly_stats
+  response = $chart_response
 }
