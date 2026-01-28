@@ -109,22 +109,8 @@ query "dashbaord/monthly_stats" verb=GET {
   
     foreach ($month_keys) {
       each as $key {
-        var $entry {
-          value = $stats_map|get:$key
-        }
-      
-        // Transform the flat entry into the nested array structure requested
         array.push $monthly_stats {
-          value = {
-            month     : $entry.month
-            start_date: $entry.start_date
-            stats     : [
-              {
-                placed_orders: $entry.placed_orders,
-                fulfilled_orders: $entry.fulfilled_orders
-              }
-            ]
-          }
+          value = $stats_map|get:$key
         }
       }
     }
