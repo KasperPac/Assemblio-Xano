@@ -17,6 +17,7 @@ table shopify_variant {
     text title?
     decimal price?
     timestamp updated_at?
+    int lead_time?
   }
 
   index = [
