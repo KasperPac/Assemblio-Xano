@@ -1,4 +1,4 @@
-query "dashbaord/monthly_stats" verb=GET {
+query "dashboard/monthly_stats" verb=GET {
   api_group = "api_v1"
   auth = "user"
 
@@ -14,8 +14,15 @@ query "dashbaord/monthly_stats" verb=GET {
       value = $ctx_tenant.self.message.tenant_id
     }
   
+    // Define timezone for consistent date operations
+    var $timezone {
+      value = "UTC"
+    }
+  
+    // Calculate start date (12 months ago)
     var $start_date {
-      value = "now"|transform_timestamp:"-12 months"
+      value = "now"
+        |transform_timestamp:"-12 months":$timezone
     }
   
     db.query order {
@@ -36,43 +43,50 @@ query "dashbaord/monthly_stats" verb=GET {
       value = []
     }
   
+    // Initialize stats for the last 12 months (Newest to Oldest)
     for (12) {
       each as $i {
         var $months_ago {
-          value = 11 - $i
+          value = $i
+        }
+      
+        var $modifier {
+          value = "-" ~ $months_ago ~ " months"
         }
       
         var $ts {
           value = "now"
-            |transform_timestamp:"-" ~ $months_ago ~ " months"
+            |transform_timestamp:$modifier:$timezone
         }
       
         var $key {
-          value = $ts|format_timestamp:"Y-m"
+          value = $ts|format_timestamp:"Y-m":$timezone
         }
       
         array.push $month_keys {
           value = $key
         }
       
+        var $initial_stats {
+          value = {
+            month           : $key
+            start_date      : $ts
+            placed_orders   : 0
+            fulfilled_orders: 0
+          }
+        }
+      
         var.update $stats_map {
-          value = $stats_map
-            |set:$key:```
-              {
-                month: $key,
-                start_date: $ts,
-                placed_orders: 0,
-                fulfilled_orders: 0
-              }
-              ```
+          value = $stats_map|set:$key:$initial_stats
         }
       }
     }
   
+    // Aggregate order data
     foreach ($orders) {
       each as $order {
         var $key {
-          value = $order.placed_at|format_timestamp:"Y-m"
+          value = $order.placed_at|format_timestamp:"Y-m":$timezone
         }
       
         conditional {
@@ -115,6 +129,7 @@ query "dashbaord/monthly_stats" verb=GET {
       value = []
     }
   
+    // Build final datasets
     foreach ($month_keys) {
       each as $key {
         var $entry {
@@ -122,7 +137,7 @@ query "dashbaord/monthly_stats" verb=GET {
         }
       
         array.push $labels {
-          value = $entry.start_date|format_timestamp:"M Y"
+          value = $entry.start_date|format_timestamp:"M Y":$timezone
         }
       
         array.push $placed_data {
