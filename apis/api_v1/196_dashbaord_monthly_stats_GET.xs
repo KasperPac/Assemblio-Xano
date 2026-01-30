@@ -186,7 +186,7 @@ query "dashbaord/monthly_stats" verb=GET {
         }
       
         conditional {
-          if ($prod_name == "") {
+          if ($prod_name == null || $prod_name == "") {
             var.update $prod_name {
               value = "Unknown Product"
             }
@@ -197,13 +197,20 @@ query "dashbaord/monthly_stats" verb=GET {
           value = $line.quantity_ordered
         }
       
-        var $current_qty {
-          value = $product_sales_map|get:$prod_name|first_notnull:0
+        var $existing_qty {
+          value = $product_sales_map|get:$prod_name
+        }
+      
+        var $safe_existing_qty {
+          value = $existing_qty|first_notnull:0
+        }
+      
+        var $new_total_qty {
+          value = $safe_existing_qty + $qty
         }
       
         var.update $product_sales_map {
-          value = $product_sales_map
-            |set:$prod_name:$current_qty + $qty
+          value = $product_sales_map|set:$prod_name:$new_total_qty
         }
       }
     }
