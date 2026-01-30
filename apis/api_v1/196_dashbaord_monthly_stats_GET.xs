@@ -158,10 +158,70 @@ query "dashbaord/monthly_stats" verb=GET {
       }
     }
   
+    // --- New Logic: Product Sales for Last Month ---
+    var $one_month_ago {
+      value = "now"|transform_timestamp:"-1 months"
+    }
+  
+    db.query order_line {
+      join = {
+        order: {
+          table: "order"
+          where: $db.order_line.order_id == $db.order.id
+        }
+      }
+    
+      where = $db.order.tenant_id == $current_tenant && $db.order.placed_at >= $one_month_ago
+      return = {type: "list"}
+    } as $recent_lines
+  
+    var $product_sales_map {
+      value = {}
+    }
+  
+    foreach ($recent_lines) {
+      each as $line {
+        var $prod_name {
+          value = $line.title
+        }
+      
+        conditional {
+          if ($prod_name == "") {
+            var.update $prod_name {
+              value = "Unknown Product"
+            }
+          }
+        }
+      
+        var $qty {
+          value = $line.quantity_ordered
+        }
+      
+        var $current_qty {
+          value = $product_sales_map|get:$prod_name|first_notnull:0
+        }
+      
+        var.update $product_sales_map {
+          value = $product_sales_map
+            |set:$prod_name:$current_qty + $qty
+        }
+      }
+    }
+  
+    var $product_labels {
+      value = $product_sales_map|keys
+    }
+  
+    var $product_sales_data {
+      value = $product_sales_map|values
+    }
+  
+    // -----------------------------------------------
+  
     var $chart_data {
       value = {
-        labels  : $labels
-        datasets: [
+        labels            : $labels
+        datasets          : [
           {
             label: "Placed Orders",
             backgroundColor: "rgb(54, 162, 235)",
@@ -178,6 +238,8 @@ query "dashbaord/monthly_stats" verb=GET {
             data: $data_cancelled
           }
         ]
+        product_labels    : $product_labels
+        product_sales_data: $product_sales_data
       }
     }
   }
