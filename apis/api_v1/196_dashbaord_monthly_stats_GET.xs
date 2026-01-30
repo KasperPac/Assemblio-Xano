@@ -1,4 +1,4 @@
-query "dashboard/monthly_stats" verb=GET {
+query "dashbaord/monthly_stats" verb=GET {
   api_group = "api_v1"
   auth = "user"
 
@@ -14,15 +14,8 @@ query "dashboard/monthly_stats" verb=GET {
       value = $ctx_tenant.self.message.tenant_id
     }
   
-    // Define timezone for consistent date operations
-    var $timezone {
-      value = "UTC"
-    }
-  
-    // Calculate start date (12 months ago)
     var $start_date {
-      value = "now"
-        |transform_timestamp:"-12 months":$timezone
+      value = "now"|transform_timestamp:"-12 months"
     }
   
     db.query order {
@@ -30,6 +23,7 @@ query "dashboard/monthly_stats" verb=GET {
       eval = {
         placed_at         : $db.order.placed_at
         fulfillment_status: $db.order.fulfillment_status
+        status_internal   : $db.order.status_internal
       }
     
       return = {type: "list"}
@@ -43,50 +37,54 @@ query "dashboard/monthly_stats" verb=GET {
       value = []
     }
   
-    // Initialize stats for the last 12 months (Newest to Oldest)
+    var $labels {
+      value = []
+    }
+  
     for (12) {
       each as $i {
         var $months_ago {
-          value = $i
-        }
-      
-        var $modifier {
-          value = "-" ~ $months_ago ~ " months"
+          value = 11 - $i
         }
       
         var $ts {
           value = "now"
-            |transform_timestamp:$modifier:$timezone
+            |transform_timestamp:"-" ~ $months_ago ~ " months"
         }
       
         var $key {
-          value = $ts|format_timestamp:"Y-m":$timezone
+          value = $ts|format_timestamp:"Y-m"
+        }
+      
+        var $label {
+          value = $ts|format_timestamp:"M Y"
         }
       
         array.push $month_keys {
           value = $key
         }
       
-        var $initial_stats {
-          value = {
-            month           : $key
-            start_date      : $ts
-            placed_orders   : 0
-            fulfilled_orders: 0
-          }
+        array.push $labels {
+          value = $label
         }
       
         var.update $stats_map {
-          value = $stats_map|set:$key:$initial_stats
+          value = $stats_map
+            |set:$key:```
+              {
+                placed_orders: 0,
+                fulfilled_orders: 0,
+                cancelled_orders: 0
+              }
+              ```
         }
       }
     }
   
-    // Aggregate order data
     foreach ($orders) {
       each as $order {
         var $key {
-          value = $order.placed_at|format_timestamp:"Y-m":$timezone
+          value = $order.placed_at|format_timestamp:"Y-m"
         }
       
         conditional {
@@ -100,11 +98,22 @@ query "dashboard/monthly_stats" verb=GET {
                 |set:"placed_orders":$entry.placed_orders + 1
             }
           
+            // Check for fulfillment status
             conditional {
               if ($order.fulfillment_status == "fulfilled") {
                 var.update $entry {
                   value = $entry
                     |set:"fulfilled_orders":$entry.fulfilled_orders + 1
+                }
+              }
+            }
+          
+            // Check for cancellation status
+            conditional {
+              if ($order.status_internal == "cancelled") {
+                var.update $entry {
+                  value = $entry
+                    |set:"cancelled_orders":$entry.cancelled_orders + 1
                 }
               }
             }
@@ -117,58 +126,61 @@ query "dashboard/monthly_stats" verb=GET {
       }
     }
   
-    var $labels {
+    var $data_placed {
       value = []
     }
   
-    var $placed_data {
+    var $data_fulfilled {
       value = []
     }
   
-    var $fulfilled_data {
+    var $data_cancelled {
       value = []
     }
   
-    // Build final datasets
     foreach ($month_keys) {
       each as $key {
         var $entry {
           value = $stats_map|get:$key
         }
       
-        array.push $labels {
-          value = $entry.start_date|format_timestamp:"M Y":$timezone
-        }
-      
-        array.push $placed_data {
+        array.push $data_placed {
           value = $entry.placed_orders
         }
       
-        array.push $fulfilled_data {
+        array.push $data_fulfilled {
           value = $entry.fulfilled_orders
+        }
+      
+        array.push $data_cancelled {
+          value = $entry.cancelled_orders
         }
       }
     }
   
-    var $datasets {
-      value = [
-        {
-          label: "Placed Orders",
-          backgroundColor: "rgb(255, 99, 132)",
-          data: $placed_data
-        },
-        {
-          label: "Fulfilled Orders",
-          backgroundColor: "rgb(54, 162, 235)",
-          data: $fulfilled_data
-        }
-      ]
-    }
-  
-    var $chart_response {
-      value = {labels: $labels, datasets: $datasets}
+    var $chart_data {
+      value = {
+        labels  : $labels
+        datasets: [
+          {
+            label: "Placed Orders",
+            backgroundColor: "rgb(54, 162, 235)",
+            data: $data_placed
+          },
+          {
+            label: "Fulfilled Orders",
+            backgroundColor: "rgb(75, 192, 192)",
+            data: $data_fulfilled
+          },
+          {
+            label: "Cancelled Orders",
+            backgroundColor: "rgb(255, 99, 132)",
+            data: $data_cancelled
+          }
+        ]
+      }
     }
   }
 
-  response = $chart_response
+  response = $chart_data
 }
