@@ -1,4 +1,4 @@
-query "dashbaord/monthly_stats" verb=GET {
+query "dashboard/monthly_stats" verb=GET {
   api_group = "api_v1"
   auth = "user"
 
