@@ -70,7 +70,13 @@ query "dashbaord/monthly_stats" verb=GET {
       
         var.update $stats_map {
           value = $stats_map
-            |set:$key:{placed_orders: 0, fulfilled_orders: 0, cancelled_orders: 0}
+            |set:$key:```
+              {
+                placed_orders: 0,
+                fulfilled_orders: 0,
+                cancelled_orders: 0
+              }
+              ```
         }
       }
     }
@@ -248,18 +254,27 @@ query "dashbaord/monthly_stats" verb=GET {
         |slice:0:5
     }
   
-    array.map ($top_products) {
-      by = $this.name
-    } as $product_labels
+    var $product_sales_datasets {
+      value = []
+    }
   
-    array.map ($top_products) {
-      by = $this.qty
-    } as $product_sales_data
+    foreach ($top_products) {
+      each as $prod {
+        array.push $product_sales_datasets {
+          value = {
+            label          : $prod.name
+            backgroundColor: "rgb(255, 99, 132)"
+            data           : [
+                $prod.qty
+              ]
+          }
+        }
+      }
+    }
   
     var.update $chart_data {
       value = $chart_data
-        |set:"product_labels":$product_labels
-        |set:"product_sales_data":$product_sales_data
+        |set:"product_sales_data":$product_sales_datasets
     }
   }
 
