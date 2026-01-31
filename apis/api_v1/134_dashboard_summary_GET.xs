@@ -24,7 +24,7 @@ query dashboard_summary verb=GET {
   
     // 3. Total Open Orders
     db.query order {
-      where = $db.order.tenant_id == $ctx_tenant.self.message.tenant_id && ($db.order.status_internal == "NEW" || $db.order.status_internal == "IN_PROGRESS" || $db.order.status_internal == "allocated")
+      where = $db.order.tenant_id == $ctx_tenant.self.message.tenant_id && ($db.order.status_internal != "cancelled" && $db.order.fulfillment_status != "fullfilled")
       return = {type: "count"}
     } as $total_open_orders
   
