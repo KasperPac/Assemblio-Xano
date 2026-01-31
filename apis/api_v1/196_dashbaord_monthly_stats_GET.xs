@@ -70,13 +70,7 @@ query "dashbaord/monthly_stats" verb=GET {
       
         var.update $stats_map {
           value = $stats_map
-            |set:$key:```
-              {
-                placed_orders: 0,
-                fulfilled_orders: 0,
-                cancelled_orders: 0
-              }
-              ```
+            |set:$key:{placed_orders: 0, fulfilled_orders: 0, cancelled_orders: 0}
         }
       }
     }
@@ -179,6 +173,71 @@ query "dashbaord/monthly_stats" verb=GET {
           }
         ]
       }
+    }
+  
+    // New Metric: Product Sales Last Month
+    var $last_month_start {
+      value = "now"|transform_timestamp:"-1 months"
+    }
+  
+    db.query order_line {
+      join = {
+        order: {
+          table: "order"
+          where: $db.order_line.order_id == $db.order.id
+        }
+      }
+    
+      where = $db.order.tenant_id == $current_tenant && $db.order.placed_at >= $last_month_start
+      eval = {
+        title   : $db.order_line.title
+        quantity: $db.order_line.quantity_ordered
+      }
+    
+      return = {type: "list"}
+    } as $sold_products
+  
+    var $product_sales_map {
+      value = {}
+    }
+  
+    foreach ($sold_products) {
+      each as $line {
+        var $p_name {
+          value = $line.title
+        }
+      
+        conditional {
+          if ($p_name == null) {
+            var.update $p_name {
+              value = "Unknown Product"
+            }
+          }
+        }
+      
+        var $qty {
+          value = $line.quantity
+        }
+      
+        // Fix: Use first_notnull to handle missing keys cleanly
+        var $current_qty {
+          value = `($product_sales_map|get:$p_name)|first_notnull:0`
+        }
+      
+        var $new_qty {
+          value = $current_qty + $qty
+        }
+      
+        var.update $product_sales_map {
+          value = $product_sales_map|set:$p_name:$new_qty
+        }
+      }
+    }
+  
+    var.update $chart_data {
+      value = $chart_data
+        |set:"product_labels":($product_sales_map|keys)
+        |set:"product_sales_data":($product_sales_map|values)
     }
   }
 
