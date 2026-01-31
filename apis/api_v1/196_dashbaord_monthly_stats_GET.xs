@@ -197,47 +197,61 @@ query "dashbaord/monthly_stats" verb=GET {
       return = {type: "list"}
     } as $sold_products
   
-    var $product_sales_map {
-      value = {}
+    // Group by title to handle aggregation safely without dot notation issues
+    array.group_by ($sold_products) {
+      by = $this.title
+    } as $grouped_sales
+  
+    var $sales_entries {
+      value = $grouped_sales|entries
     }
   
-    foreach ($sold_products) {
-      each as $line {
+    var $product_labels {
+      value = []
+    }
+  
+    var $product_sales_data {
+      value = []
+    }
+  
+    foreach ($sales_entries) {
+      each as $entry {
         var $p_name {
-          value = $line.title
+          value = $entry.key
         }
       
+        // Handle potential null/empty keys
         conditional {
-          if ($p_name == null) {
+          if ($p_name == "null" || $p_name == "") {
             var.update $p_name {
               value = "Unknown Product"
             }
           }
         }
       
-        var $qty {
-          value = $line.quantity
+        array.push $product_labels {
+          value = $p_name
         }
       
-        // Fix: Use first_notnull to handle missing keys cleanly
-        var $current_qty {
-          value = `($product_sales_map|get:$p_name)|first_notnull:0`
+        // Use array.map to extract quantities safely, avoiding $this context issues in var expressions
+        array.map ($entry.value) {
+          by = $this.quantity
+        } as $quantities
+      
+        var $total_qty {
+          value = $quantities|sum
         }
       
-        var $new_qty {
-          value = $current_qty + $qty
-        }
-      
-        var.update $product_sales_map {
-          value = $product_sales_map|set:$p_name:$new_qty
+        array.push $product_sales_data {
+          value = $total_qty
         }
       }
     }
   
     var.update $chart_data {
       value = $chart_data
-        |set:"product_labels":($product_sales_map|keys)
-        |set:"product_sales_data":($product_sales_map|values)
+        |set:"product_labels":$product_labels
+        |set:"product_sales_data":$product_sales_data
     }
   }
 
