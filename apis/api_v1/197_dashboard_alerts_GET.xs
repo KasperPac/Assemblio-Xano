@@ -37,5 +37,5 @@ query "dashboard/alerts" verb=GET {
     } as $low_stock_components
   }
 
-  response = $low_stock_components
+  response = {Low_Stock_Comp: $low_stock_components}
 }
