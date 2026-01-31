@@ -206,11 +206,7 @@ query "dashbaord/monthly_stats" verb=GET {
       value = $grouped_sales|entries
     }
   
-    var $product_labels {
-      value = []
-    }
-  
-    var $product_sales_data {
+    var $product_stats_list {
       value = []
     }
   
@@ -229,24 +225,36 @@ query "dashbaord/monthly_stats" verb=GET {
           }
         }
       
-        array.push $product_labels {
-          value = $p_name
-        }
-      
-        // Use array.map to extract quantities safely, avoiding $this context issues in var expressions
+        // Extract quantities using array.map statement to ensure $this scope
         array.map ($entry.value) {
           by = $this.quantity
-        } as $quantities
+        } as $product_quantities
       
+        // Sum the quantities for this product
         var $total_qty {
-          value = $quantities|sum
+          value = $product_quantities|sum
         }
       
-        array.push $product_sales_data {
-          value = $total_qty
+        array.push $product_stats_list {
+          value = {name: $p_name, qty: $total_qty}
         }
       }
     }
+  
+    // Sort by quantity descending and slice top 5
+    var $top_products {
+      value = $product_stats_list
+        |sort:"qty":"decimal":false
+        |slice:0:5
+    }
+  
+    array.map ($top_products) {
+      by = $this.name
+    } as $product_labels
+  
+    array.map ($top_products) {
+      by = $this.qty
+    } as $product_sales_data
   
     var.update $chart_data {
       value = $chart_data
