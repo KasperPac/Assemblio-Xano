@@ -254,19 +254,27 @@ query "dashbaord/monthly_stats" verb=GET {
         |slice:0:5
     }
   
+    var $product_labels {
+      value = []
+    }
+  
     var $product_sales_datasets {
       value = []
     }
   
     foreach ($top_products) {
       each as $prod {
+        array.push $product_labels {
+          value = $prod.name
+        }
+      
         array.push $product_sales_datasets {
           value = {
             label          : $prod.name
             backgroundColor: "rgb(255, 99, 132)"
             data           : [
-                $prod.qty
-              ]
+                  $prod.qty
+                ]
           }
         }
       }
@@ -275,6 +283,7 @@ query "dashbaord/monthly_stats" verb=GET {
     var.update $chart_data {
       value = $chart_data
         |set:"product_sales_data":$product_sales_datasets
+        |set:"product_labels":$product_labels
     }
   }
 
