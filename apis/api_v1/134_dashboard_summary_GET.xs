@@ -18,13 +18,13 @@ query dashboard_summary verb=GET {
   
     // 2. Total Products with Active BOM
     db.query product_bom {
-      where = $db.product_bom.tenant_id == $ctx_tenant.self.message.tenant_id && $db.product_bom.is_active
+      where = $db.product_bom.tenant_id == $ctx_tenant.self.message.tenant_id && $db.product_bom.is_active == true
       return = {type: "count"}
     } as $total_products_with_bom
   
     // 3. Total Open Orders
     db.query order {
-      where = $db.order.tenant_id == $ctx_tenant.self.message.tenant_id && ($db.order.status_internal != "cancelled" && ($db.order.fulfillment_status|to_upper) != ("fullfilled"|to_upper))
+      where = $db.order.tenant_id == $ctx_tenant.self.message.tenant_id && ($db.order.status_internal != "cancelled" && ($db.order.fulfillment_status|to_upper) != ("fulfilled"|to_upper))
       return = {type: "count"}
     } as $total_open_orders
   
@@ -61,7 +61,7 @@ query dashboard_summary verb=GET {
         product_bom: {
           table: "product_bom"
           type : "left"
-          where: $db.shopify_variant.id == $db.product_bom.shopify_variant_id && $db.product_bom.is_active
+          where: $db.shopify_variant.id == $db.product_bom.shopify_variant_id && $db.product_bom.is_active == true
         }
       }
     

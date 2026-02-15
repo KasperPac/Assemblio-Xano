@@ -18,7 +18,7 @@ query "deleted/bom" verb=GET {
         }
       }
     
-      where = $db.product_bom.tenant_id == $ctx_tenant.self.message.tenant_id && $db.product_bom.deleted
+      where = $db.product_bom.tenant_id == $ctx_tenant.self.message.tenant_id && $db.product_bom.deleted == true
       eval = {
         sku  : $db.shopify_variant.sku
         title: $db.shopify_variant.title

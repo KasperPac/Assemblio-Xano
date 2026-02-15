@@ -11,7 +11,7 @@ query "deleted/components" verb=GET {
     } as $ctx_tenant
   
     db.query component {
-      where = $db.component.tenant_id == $ctx_tenant.self.message.tenant_id && $db.component.deleted
+      where = $db.component.tenant_id == $ctx_tenant.self.message.tenant_id && $db.component.deleted == true
       return = {type: "list"}
     } as $response
   }

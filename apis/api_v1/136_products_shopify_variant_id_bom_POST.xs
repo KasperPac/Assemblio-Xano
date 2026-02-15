@@ -39,7 +39,7 @@ query "products/{shopify_variant_id}/bom" verb=POST {
   
     // Find currently active BOMs for this variant and tenant to deactivate them
     db.query product_bom {
-      where = $db.product_bom.tenant_id == $ctx_tenant.self.message.tenant_id && $db.product_bom.shopify_variant_id == $nested_variant_id.id && $db.product_bom.is_active
+      where = $db.product_bom.tenant_id == $ctx_tenant.self.message.tenant_id && $db.product_bom.shopify_variant_id == $nested_variant_id.id && $db.product_bom.is_active == true
       return = {type: "list"}
     } as $active_boms
   

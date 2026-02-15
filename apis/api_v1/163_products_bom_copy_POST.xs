@@ -25,7 +25,7 @@ query "products/bom/copy" verb=POST {
     }
   
     db.query product_bom {
-      where = $db.product_bom.shopify_variant_id == $input.copy_variant && $db.product_bom.is_active && $db.product_bom.tenant_id == $tenant_id
+      where = $db.product_bom.shopify_variant_id == $input.copy_variant && $db.product_bom.is_active == true && $db.product_bom.tenant_id == $tenant_id
       return = {type: "single"}
     } as $source_bom
   

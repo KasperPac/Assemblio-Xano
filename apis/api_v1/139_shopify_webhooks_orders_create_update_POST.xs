@@ -15,7 +15,7 @@ query "shopify/webhooks/orders_create_update" verb=POST {
     }
   
     var $shop_domain {
-      value = $env.$http_headers.X-Shopify-Shop-Domain
+      value = $env.$http_headers["X-Shopify-Shop-Domain"]
     }
   
     !var $shop_domain {
@@ -242,7 +242,7 @@ query "shopify/webhooks/orders_create_update" verb=POST {
       
         // Step 12: Find Active BOM for Variant
         db.query product_bom {
-          where = $db.product_bom.shopify_variant_id == $variant_id_resolved && $db.product_bom.tenant_id == $tenant_id && $db.product_bom.is_active
+          where = $db.product_bom.shopify_variant_id == $variant_id_resolved && $db.product_bom.tenant_id == $tenant_id && $db.product_bom.is_active == true
           return = {type: "single"}
         } as $active_bom
       
@@ -283,7 +283,7 @@ query "shopify/webhooks/orders_create_update" verb=POST {
                 conditional {
                   if ($allocation_location_id == null || $allocation_location_id == 0) {
                     db.query location {
-                      where = $db.location.tenant_id == $tenant_id && $db.location.is_default
+                      where = $db.location.tenant_id == $tenant_id && $db.location.is_default == true
                       return = {type: "single"}
                     } as $tenant_default_location
                   

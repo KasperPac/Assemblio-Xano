@@ -16,7 +16,7 @@ query "suppliers/bulk-import" verb=POST {
   
     // Retrieve the default location for the tenant
     db.query location {
-      where = $db.location.tenant_id == $ctx_tenant.self.message.tenant_id && $db.location.is_default
+      where = $db.location.tenant_id == $ctx_tenant.self.message.tenant_id && $db.location.is_default == true
       return = {type: "single"}
     } as $default_location
   
